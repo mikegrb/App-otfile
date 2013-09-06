@@ -1,0 +1,110 @@
+#!/usr/bin/env perl
+
+use 5.010;
+
+use warnings;
+use strict;
+
+use autodie;
+
+use File::MMagic;
+use UUID::Tiny;
+use Sys::HostIP;
+use URI::Escape;
+use Term::ProgressBar;
+use Mac::Pasteboard;
+
+{
+    no warnings 'redefine';
+    *Term::ProgressBar::term_size = sub { return 50 };
+}
+
+use base qw(HTTP::Server::Simple);
+
+my @preferered_interfaces = qw(eth0 wlan0);
+
+say "usage: otfile <file>" and exit 1 if @ARGV != 1;
+
+my ($file) = @ARGV;
+
+open my $fh, "<", $file; close $fh;
+
+my $mm = File::MMagic->new;
+my $type = $mm->checktype_filename($file);
+
+my $size = (stat $file)[7];
+
+my ($fileonly) = $file =~ m{/?([^/]+)$};
+
+my $uuid = create_UUID_as_string(UUID_V4);
+
+print "I: serving '$file' as '$fileonly', size $size, type $type\n";
+
+my $server = __PACKAGE__->new(1234);
+
+my $interfaces = Sys::HostIP->interfaces;
+my ($ip) = grep { defined } (@{$interfaces}{@preferered_interfaces}, Sys::HostIP->ip);
+
+my $port = $server->port;
+my $path = "/$uuid/".uri_escape($fileonly);
+my $url = "http://$ip:$port$path";
+
+print "I: url is: $url\n";
+pbcopy($url);
+
+$server->run;
+
+my $error;
+
+sub setup {
+    my ($self, %args) = @_;
+
+    print STDERR "I: request from $args{peername}\n";
+
+    if ($args{path} ne $path) {
+        $error = "403 Forbidden";
+        print STDERR "E: invalid request for $args{path}\n";
+    }
+}
+
+sub handler {
+    my ($self) = @_;
+
+    if ($error) {
+        print "HTTP/1.0 $error\n";
+        print "Pragma: no-cache\n";
+        print "\n";
+        return;
+    }
+
+    open my $fh, "<", $file;
+
+    print "HTTP/1.0 200 OK\n";
+    print "Pragma: no-cache\n";
+    print "Content-type: $type\n";
+    print "Content-length: $size\n";
+    print "Content-disposition: inline; filename=\"$fileonly\"\n";
+    print "\n";
+
+    my $p = Term::ProgressBar->new({
+        name => $fileonly,
+        count => $size,
+        ETA => "linear",
+    });
+    $p->minor(0);
+
+    my $total = 0;
+    while (my $len = sysread $fh, my $buf, 4096) {
+        print $buf;
+        $total += $len;
+        $p->update($total);
+    }
+
+    $p->update($size);
+
+    close $fh;
+
+    exit;
+}
+
+sub print_banner {}

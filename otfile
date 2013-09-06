@@ -1,0 +1,144 @@
+#!/usr/bin/env perl
+
+use 5.0101;
+use warnings;
+use strict;
+use autodie;
+
+use File::Basename;
+use IO::Socket::INET;
+
+my @preferered_interfaces = (qw(eth0 wlan0));
+my $port                  = 1234;
+
+die "usage: $0 <file>\n" if @ARGV != 1;
+my $file = shift;
+die "Unable to read '$file'\n" unless -r $file;
+
+# try loading some optional dependencies
+my %opt_depend;
+eval { require Mac::Pasteboard; $opt_depend{pasteboard} = 1 };
+eval { require File::MMagic;    $opt_depend{mmagic}     = 1 };
+eval { require UUID::Tiny;      $opt_depend{uuid}       = 1 };
+eval { require URI::Escape;     $opt_depend{uri_escape} = 1 };
+eval {
+    require Term::ProgressBar;
+    no warnings( 'redefine', 'once' );
+    *Term::ProgressBar::term_size = sub { return 40 };
+    $opt_depend{progress} = 1;
+};
+
+my $type     = get_file_type($file);
+my $size     = -s $file;
+my $filename = fileparse($file);
+my $uuid     = gen_uniq_string();
+my $ip       = get_local_ip();
+my $path     = "/$uuid/" . check_escape($filename);
+my $url      = "http://$ip:$port$path";
+
+say "Serving '$file' as '$filename', size $size, type $type";
+if ( $opt_depend{pasteboard} ) {
+    Mac::Pasteboard::pbcopy($url);
+    say "$url copied to clipboard.";
+}
+else {
+    say $url;
+}
+
+my $server = IO::Socket::INET->new(
+    Listen    => 5,
+    LocalAddr => $ip,
+    LocalPort => $port,
+    Proto     => 'tcp'
+);
+die "Couldn't open socket for listening: $!\n" unless $server;
+
+while ( my $client = $server->accept() ) {
+    say 'I: Connect from ' . $client->peerhost;
+    my $requested_path;
+    LINE: while ( my $line = <$client> ) {
+        last if $line =~ m/^\s*$/;
+        $requested_path = $1 if $line =~ /^GET (\S+) /;
+    }
+    if ( $path ne $requested_path ) {
+        say "E: Invalid request for $requested_path";
+        say $client "HTTP/1.0 403 Forbidden FOAD.\n\n";
+        close $client;
+        next;
+    }
+    open my $fh, "<", $file;
+
+    say $client "HTTP/1.0 200 OK";
+    say $client "Pragma: no-cache";
+    say $client "Content-type: $type";
+    say $client "Content-length: $size";
+    say $client "Content-disposition: inline; filename=\"$filename\"";
+    say $client "";
+
+    my $p;
+    if ( $opt_depend{progress} ) {
+        $p = Term::ProgressBar->new(
+            {   name  => $filename,
+                count => $size,
+                ETA   => "linear",
+            } );
+        $p->minor(0);
+    }
+    else {
+        say "Serving file.";
+    }
+
+    my $total = 0;
+    while ( my $len = sysread $fh, my $buf, 4096 ) {
+        print $client $buf;
+        $total += $len;
+        $p->update($total) if $opt_depend{progress};
+    }
+    $p->update($size) if $opt_depend{progress};
+    say "\nDone.";
+
+    close $fh;
+    $client->close;
+    $server->shutdown(2);
+    $server->close;
+}
+
+# From Net::Address::IP::Local
+sub get_local_ip {
+    my $socket = IO::Socket::INET->new(
+        Proto    => 'udp',
+        PeerAddr => '198.41.0.4',    # a.root-servers.net
+        PeerPort => '53',            # DNS
+    );
+    my $local_ip_address = $socket->sockhost;
+    return $local_ip_address;
+}
+
+sub get_file_type {
+    my $path = shift;
+    return 'application/data' unless $opt_depend{mmagic};
+    my $type = File::MMagic->new->checktype_filename($file);
+    $type =~ s/;.*$//;
+    return $type;
+}
+
+sub gen_uniq_string {
+    return UUID::Tiny::create_UUID_as_string() if $opt_depend{uuid};
+    my @chars = ( qw(
+            A B D E F G H K M N P Q R S T U V W X Y Z
+            a b d e f g h k m n p q r s t u v w x y z
+            2 3 4 5 6 7 8 9
+    ) );
+    my $string;
+    $string .= $chars[ int rand( scalar @chars ) ] for 1 .. 30;
+    return $string;
+}
+
+sub check_escape {
+    my $string = shift;
+    return URI::Escape::uri_escape($string) if $opt_depend{uri_escape};
+    die "You don't have URI::Escape and '$string' contains unsafe characters\n."
+        if $string
+        =~ m/[^A-Za-z0-9\-\._~]/;    # RFC3986 unsafe chars from URI::Escape
+    return $string;
+}
