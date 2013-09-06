@@ -8,8 +8,7 @@ use autodie;
 use File::Basename;
 use IO::Socket::INET;
 
-my @preferered_interfaces = (qw(eth0 wlan0));
-my $port                  = 1234;
+my $port = 1234;
 
 die "usage: $0 <file>\n" if @ARGV != 1;
 my $file = shift;
