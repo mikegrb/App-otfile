@@ -5,17 +5,16 @@ use warnings;
 use strict;
 use autodie;
 
-use Getopt::Std;
+use Getopt::Long;
 use File::Basename;
 use IO::Socket::INET;
 
-my %opts;
-getopt('ap:', \%opts);
-my $port      = $opts{p} || 1234;
-my $auto_port = $opts{a} || 0;
 
-die "usage: $0 [opts] <file>\n" if @ARGV != 1;
-my $file = shift;
+my $port      = 1234;
+my $auto_port = 0;
+GetOptions('auto' => \$auto_port, 'port=i' => \$port);
+
+my $file = shift or die "usage: $0 [opts] <file>\n";
 die "Unable to read '$file'\n" unless -r $file;
 
 # try loading some optional dependencies
