@@ -5,16 +5,19 @@ use warnings;
 use strict;
 use autodie;
 
+use Pod::Usage;
 use Getopt::Long;
 use File::Basename;
 use IO::Socket::INET;
 
-
 my $port      = 1234;
 my $auto_port = 0;
-GetOptions('auto' => \$auto_port, 'port=i' => \$port);
+GetOptions(
+    'auto'   => \$auto_port,
+    'port=i' => \$port,
+    'help'   => sub { pod2usage(1) } ) or pod2usage(2);
 
-my $file = shift or die "usage: $0 [opts] <file>\n";
+my $file = shift or do { warn "Must provide file to serve\n"; pod2usage(2) };
 die "Unable to read '$file'\n" unless -r $file;
 
 # try loading some optional dependencies
@@ -151,3 +154,35 @@ sub check_escape {
         =~ m/[^A-Za-z0-9\-\._~]/;    # RFC3986 unsafe chars from URI::Escape
     return $string;
 }
+__END__
+=head1 NAME
+
+otfile - Serve a single file, once, via HTTP over the local network.
+
+=head1 SYNOPSIS
+
+$ otfile [-a -p 1234] <file to serve>
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--auto> or B<-a>
+
+Auto port selection.  increments specified port until successful.
+
+=item B<--port=N> or B<-p N>
+
+Use specified port, defaults to 1234.
+
+=item B<--help> or B<-h>
+
+this help information
+
+=item B<--man> or B<-m>
+
+show full man page
+
+=back
+
+=cut
