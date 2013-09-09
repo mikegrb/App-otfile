@@ -39,4 +39,23 @@ Done.
 
 Credit
 ====
-This script based on one shamelessly stolen from some guys blog post years ago.  I don't remember where I found the idea but it was a great one.  If you see this please tell me who you are so I can thank you!
+This script based on one shamelessly stolen from some guys blog post years ago.  I don't remember where I found the idea but it was a great one.  If you see this please tell me who you are so I can thank you!# SYNOPSIS
+
+Documentations on Usage:
+===
+
+$ otfile \[-a -p 1234\] file_to_serve
+
+# OPTIONS
+
+- __\--auto__ or __\-a__
+
+    Auto port selection.  increments specified port until successful.
+
+- __\--port=N__ or __\-p N__
+
+    Use specified port, defaults to 1234.
+
+- __\--help__ or __\-h__
+
+    this help information

@@ -179,10 +179,6 @@ Use specified port, defaults to 1234.
 
 this help information
 
-=item B<--man> or B<-m>
-
-show full man page
-
 =back
 
 =cut
