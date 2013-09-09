@@ -5,12 +5,16 @@ use warnings;
 use strict;
 use autodie;
 
+use Getopt::Std;
 use File::Basename;
 use IO::Socket::INET;
 
-my $port = 1234;
+my %opts;
+getopt('ap:', \%opts);
+my $port      = $opts{p} || 1234;
+my $auto_port = $opts{a} || 0;
 
-die "usage: $0 <file>\n" if @ARGV != 1;
+die "usage: $0 [opts] <file>\n" if @ARGV != 1;
 my $file = shift;
 die "Unable to read '$file'\n" unless -r $file;
 
@@ -33,8 +37,23 @@ my $filename = fileparse($file);
 my $uuid     = gen_uniq_string();
 my $ip       = get_local_ip();
 my $path     = "/$uuid/" . check_escape($filename);
-my $url      = "http://$ip:$port$path";
 
+my $server;
+while ( !$server ) {
+    $server = IO::Socket::INET->new(
+        Listen    => 5,
+        LocalAddr => $ip,
+        LocalPort => $port,
+        Proto     => 'tcp'
+    );
+    last if $server;
+    if ( !$auto_port || $! ne 'Address already in use' ) {
+        die "Couldn't open socket for listening: $!\n";
+    }
+    $port++;
+}
+
+my $url = "http://$ip:$port$path";
 say "Serving '$file' as '$filename', size $size, type $type";
 if ( $opt_depend{pasteboard} ) {
     Mac::Pasteboard::pbcopy($url);
@@ -43,14 +62,6 @@ if ( $opt_depend{pasteboard} ) {
 else {
     say $url;
 }
-
-my $server = IO::Socket::INET->new(
-    Listen    => 5,
-    LocalAddr => $ip,
-    LocalPort => $port,
-    Proto     => 'tcp'
-);
-die "Couldn't open socket for listening: $!\n" unless $server;
 
 while ( my $client = $server->accept() ) {
     say 'I: Connect from ' . $client->peerhost;
