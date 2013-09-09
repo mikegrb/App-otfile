@@ -1,9 +1,12 @@
-Revision history for WebService-BasecampX
+Revision history for App-otfile
 
-2013-09-09 01:25:48 EDT
+{{$NEXT}}
+        - CPANified
+
+0.02 2013-09-09 01:25:48 EDT
         - --help or -h for help
         - --port or -p to specify port to use
         - --auto or -a to auto-pick available port
 
-2013-09-06 17:04:24 EDT
+0.01 2013-09-06 17:04:24 EDT
         - Initial release
