@@ -181,4 +181,15 @@ this help information
 
 =back
 
-=cut
+=head1 AUTHOR
+
+Mike Greb E<lt>michael@thegrebs.comE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2013- Mike Greb
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
