@@ -1,6 +1,8 @@
 package App::otfile;
  
 use strict;
+use warnings;
+
 use vars qw($VERSION);
 $VERSION = '0.03';
  
