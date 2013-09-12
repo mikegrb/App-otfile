@@ -7,7 +7,6 @@ Requirements
 ====
 * Perl 5.10.1
 
-
 Optional Dependencies
 ====
 
@@ -18,6 +17,24 @@ otfile will make use of the following modules, if available:
 * File::MMagic - For detecting and setting correct MIME-type, otherwise ```application/data``` is used.
 * UUID::Tiny - For generating a UUID for the path, otherwise a random string is used.
 * URI::Escape - If unsafe characters are in filename, they will be escaped by URI::Escape if it is present, otherwise, otfile will die with an error.
+
+Installation
+====
+```
+$ curl -O https://raw.github.com/mikegrb/One-Time-File/master/script/otfile
+$ # or
+$ wget https://raw.github.com/mikegrb/One-Time-File/master/script/otfile
+$ # then
+$ chmod +x otfile
+```
+
+For best results, put somewhere in your path.  This script is also packaged on
+the CPAN as ```App::otfile``` so you can install from there with your favorite
+CPAN client.
+
+```
+$ cpanm App::otfile
+```
 
 Usage
 ====
