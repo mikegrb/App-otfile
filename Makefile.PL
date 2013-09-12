@@ -23,7 +23,7 @@ my %WriteMakefileArgs = (
   "NAME" => "App::otfile",
   "PREREQ_PM" => {},
   "TEST_REQUIRES" => {},
-  "VERSION" => "0.03",
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/*.t"
   }

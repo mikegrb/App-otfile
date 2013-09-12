@@ -1,6 +1,8 @@
 Revision history for App-otfile
 
 {{$NEXT}}
+
+0.04  2013-09-12 05:17:05 EDT
         - Add author, copyright, & license sections to otfile.pm
 
 0.03  2013-09-09 02:19:39 EDT
