@@ -1,6 +1,7 @@
 Revision history for App-otfile
 
 {{$NEXT}}
+        - -m to serve a file multiple times, doesn't exit until ctrl+c
 
 0.04  2013-09-12 05:17:05 EDT
         - Add author, copyright, & license sections to otfile.pm

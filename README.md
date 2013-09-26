@@ -73,6 +73,12 @@ $ otfile \[-a -p 1234\] file_to_serve
 
     Use specified port, defaults to 1234.
 
+- __\--multiple__ or __\-m__
+
+    Don't exit after serving the file the first time. To serve a file to multiple
+    people. Requires, CTL+C to exit.
+
+
 - __\--help__ or __\-h__
 
     this help information

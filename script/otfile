@@ -10,12 +10,14 @@ use Getopt::Long;
 use File::Basename;
 use IO::Socket::INET;
 
-my $port      = 1234;
-my $auto_port = 0;
+my $port           = 1234;
+my $auto_port      = 0;
+my $serve_multiple = 0;
 GetOptions(
-    'auto'   => \$auto_port,
-    'port=i' => \$port,
-    'help'   => sub { pod2usage(1) } ) or pod2usage(2);
+    'auto'     => \$auto_port,
+    'port=i'   => \$port,
+    'multiple' => \$serve_multiple,
+    'help'     => sub { pod2usage(1) } ) or pod2usage(2);
 
 my $file = shift or do { warn "Must provide file to serve\n"; pod2usage(2) };
 die "Unable to read '$file'\n" unless -r $file;
@@ -29,7 +31,7 @@ eval { require URI::Escape;     $opt_depend{uri_escape} = 1 };
 eval {
     require Term::ProgressBar;
     no warnings( 'redefine', 'once' );
-    *Term::ProgressBar::term_size = sub { return 40 };
+    *Term::ProgressBar::term_size = sub { return 10 };
     $opt_depend{progress} = 1;
 };
 
@@ -111,8 +113,8 @@ while ( my $client = $server->accept() ) {
 
     close $fh;
     $client->close;
-    $server->shutdown(2);
-    $server->close;
+    $server->shutdown(2) unless $serve_multiple;
+    $server->close unless $serve_multiple;
 }
 
 # From Net::Address::IP::Local
@@ -169,11 +171,16 @@ $ otfile [-a -p 1234] <file to serve>
 
 =item B<--auto> or B<-a>
 
-Auto port selection.  increments specified port until successful.
+Auto port selection.  Increments specified port until successful.
 
 =item B<--port=N> or B<-p N>
 
 Use specified port, defaults to 1234.
+
+=item B<--multiple> or B<-m>
+
+Don't exit after serving the file the first time. To serve a file to multiple
+people. Requires, CTL+C to exit.
 
 =item B<--help> or B<-h>
 
