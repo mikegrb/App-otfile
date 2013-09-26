@@ -4,7 +4,7 @@
       "Mike Greb <michael@thegrebs.com"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.4, Dist::Zilla version 4.300038, CPAN::Meta::Converter version 2.131560",
+   "generated_by" : "Dist::Milla version v1.0.4, Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.131560",
    "license" : [
       "perl_5"
    ],
@@ -60,7 +60,7 @@
          "web" : "https://github.com/mikegrb/One-Time-File"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_contributors" : [
       "mikegrb <mgreb@linode.com>"
    ]
