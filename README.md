@@ -36,7 +36,7 @@ CPAN client.
 $ cpanm App::otfile
 ```
 
-Usage
+Usage Example
 ====
 
 ```
@@ -56,9 +56,9 @@ Done.
 
 Credit
 ====
-This script based on one shamelessly stolen from some guys blog post years ago.  I don't remember where I found the idea but it was a great one.  If you see this please tell me who you are so I can thank you!# SYNOPSIS
+This script based on one shamelessly stolen from some guys blog post years ago.  I don't remember where I found the idea but it was a great one.  If you see this please tell me who you are so I can thank you!
 
-Documentations on Usage:
+Usage Documentation
 ===
 
 $ otfile \[-a -p 1234\] file_to_serve
