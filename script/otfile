@@ -24,16 +24,11 @@ die "Unable to read '$file'\n" unless -r $file;
 
 # try loading some optional dependencies
 my %opt_depend;
-eval { require Mac::Pasteboard; $opt_depend{pasteboard} = 1 };
-eval { require File::MMagic;    $opt_depend{mmagic}     = 1 };
-eval { require UUID::Tiny;      $opt_depend{uuid}       = 1 };
-eval { require URI::Escape;     $opt_depend{uri_escape} = 1 };
-eval {
-    require Term::ProgressBar;
-    no warnings( 'redefine', 'once' );
-    *Term::ProgressBar::term_size = sub { return 10 };
-    $opt_depend{progress} = 1;
-};
+eval { require Mac::Pasteboard;   $opt_depend{pasteboard} = 1 };
+eval { require File::MMagic;      $opt_depend{mmagic}     = 1 };
+eval { require UUID::Tiny;        $opt_depend{uuid}       = 1 };
+eval { require URI::Escape;       $opt_depend{uri_escape} = 1 };
+eval { require Term::ProgressBar; $opt_depend{progress}   = 1 };
 
 my $type     = get_file_type($file);
 my $size     = -s $file;
@@ -92,9 +87,10 @@ while ( my $client = $server->accept() ) {
     my $p;
     if ( $opt_depend{progress} ) {
         $p = Term::ProgressBar->new(
-            {   name  => $filename,
-                count => $size,
-                ETA   => "linear",
+            {   name       => $filename,
+                count      => $size,
+                ETA        => "linear",
+                term_width => 40,
             } );
         $p->minor(0);
     }
