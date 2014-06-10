@@ -1,6 +1,8 @@
 Revision history for App-otfile
 
 {{$NEXT}}
+        - --self or -s to serve a copy of itself
+        - minor rephrasing of some help text
         - INTERNAL cleanup Term::ProgressBar terminal width setting
 
 0.05  2013-09-26 19:51:19 EDT

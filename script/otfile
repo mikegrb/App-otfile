@@ -13,12 +13,16 @@ use IO::Socket::INET;
 my $port           = 1234;
 my $auto_port      = 0;
 my $serve_multiple = 0;
+my $serve_self     = 0;
+
 GetOptions(
     'auto'     => \$auto_port,
     'port=i'   => \$port,
     'multiple' => \$serve_multiple,
+    'self'     => \$serve_self,
     'help'     => sub { pod2usage(1) } ) or pod2usage(2);
 
+unshift @ARGV, __FILE__ if $serve_self;
 my $file = shift or do { warn "Must provide file to serve\n"; pod2usage(2) };
 die "Unable to read '$file'\n" unless -r $file;
 
@@ -175,12 +179,16 @@ Use specified port, defaults to 1234.
 
 =item B<--multiple> or B<-m>
 
-Don't exit after serving the file the first time. To serve a file to multiple
+Don't exit after serving the file the first time. For serving a file to multiple
 people. Requires, CTL+C to exit.
+
+=item B<--self> or B<-s>
+
+Serve a copy of the otfile script.
 
 =item B<--help> or B<-h>
 
-this help information
+This help information.
 
 =back
 
