@@ -1,6 +1,8 @@
 Revision history for App-otfile
 
 {{$NEXT}}
+        - Add Clipboard.pm for clipboard access, adding support for
+          Windows and Linux.
         - --self or -s to serve a copy of itself
         - minor rephrasing of some help text
         - INTERNAL cleanup Term::ProgressBar terminal width setting

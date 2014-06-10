@@ -28,7 +28,13 @@ die "Unable to read '$file'\n" unless -r $file;
 
 # try loading some optional dependencies
 my %opt_depend;
-eval { require Mac::Pasteboard;   $opt_depend{pasteboard} = 1 };
+
+# we try for Mac::Pasteboard first for pre 0.06 people that have it
+# but don't have Clipboard installed
+
+eval { require Mac::Pasteboard; $opt_depend{pasteboard} = 1 };
+eval { require Clipboard;       $opt_depend{clipboard}  = 1 }
+    unless $opt_depend{pasteboard};
 eval { require File::MMagic;      $opt_depend{mmagic}     = 1 };
 eval { require UUID::Tiny;        $opt_depend{uuid}       = 1 };
 eval { require URI::Escape;       $opt_depend{uri_escape} = 1 };
@@ -57,9 +63,16 @@ while ( !$server ) {
 }
 
 my $url = "http://$ip:$port$path";
+
 say "Serving '$file' as '$filename', size $size, type $type";
+
 if ( $opt_depend{pasteboard} ) {
     Mac::Pasteboard::pbcopy($url);
+    say "$url copied to clipboard.";
+}
+elsif ( $opt_depend{clipboard} ) {
+    Clipboard->import;    # finds OS driver
+    Clipboard->copy($url);
     say "$url copied to clipboard.";
 }
 else {
