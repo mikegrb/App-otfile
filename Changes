@@ -1,6 +1,8 @@
 Revision history for App-otfile
 
 {{$NEXT}}
+
+0.06  2014-06-10 22:38:38 EDT
         - Add Clipboard.pm for clipboard access, adding support for
           Windows and Linux.
         - --self or -s to serve a copy of itself
