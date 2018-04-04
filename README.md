@@ -69,6 +69,11 @@ $ otfile \[-a -p 1234\] file_to_serve
 
     Auto port selection.  increments specified port until successful.
 
+- __\--uuid=string__  or __\-u string__
+
+    Use specified string in place of an UUID. Useful when using this script to serve
+    a file to yourself on another machinee and you must manually type the URL.<Paste>
+
 - __\--port=N__ or __\-p N__
 
     Use specified port, defaults to 1234.
