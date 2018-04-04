@@ -195,7 +195,7 @@ Use specified port, defaults to 1234.
 =item B<--uuid=string> or B<-u string>
 
 Use specified string in place of an UUID. Useful when using this script to serve
-a file to yourself on another machinee and you must manually type the URL.
+a file to yourself on another machine and you must manually type the URL.
 
 =item B<--multiple> or B<-m>
 
