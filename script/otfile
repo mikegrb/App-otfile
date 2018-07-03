@@ -34,6 +34,7 @@ my %opt_depend;
 # we try for Mac::Pasteboard first for pre 0.06 people that have it
 # but don't have Clipboard installed
 
+## no critic (RequireCheckingReturnValueofEval)
 eval { require Mac::Pasteboard; $opt_depend{pasteboard} = 1 };
 eval { require Clipboard;       $opt_depend{clipboard}  = 1 }
     unless $opt_depend{pasteboard};
@@ -41,6 +42,7 @@ eval { require File::MMagic;      $opt_depend{mmagic}     = 1 };
 eval { require UUID::Tiny;        $opt_depend{uuid}       = 1 };
 eval { require URI::Escape;       $opt_depend{uri_escape} = 1 };
 eval { require Term::ProgressBar; $opt_depend{progress}   = 1 };
+## use critic
 
 my $type     = get_file_type($file);
 my $size     = -s $file;
